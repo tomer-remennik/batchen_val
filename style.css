@@ -1,6 +1,124 @@
-.test {
-  width: 150px;
-  height: 150px;
+@font-face {
+  font-family: "MyCustomFont";
+  src: url("./fonts/custom_font.woff") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+html, body {
+  font-family: "MyCustomFont", sans-serif;
+}
+
+button, input, select, textarea {
+  font-family: "MyCustomFont", sans-serif;
+}
+
+html, body {
+  font-family: "MyCustomFont", sans-serif;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: black;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+#loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.heart-loader {
+  width: 50vw;
+  height: auto;
+  animation: heart-beat 1.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+  transform-origin: center;
+}
+
+@keyframes heart-beat {
+  0% {
+    transform: scale(0.95);
+  }
+  5% {
+    transform: scale(1.15);
+  }
+  39% {
+    transform: scale(0.85);
+  }
+  45% {
+    transform: scale(1.05);
+  }
+  60% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(0.9);
+  }
+}
+.video-container {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+.video-container video {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.question-text {
+  margin-top: -5vh;
+  padding-inline: 8vw;
+  font-size: 8rem;
+  text-align: center;
+  color: white;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-evenly;
+  width: 100vw;
+}
+
+.option-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 35vw;
+  border: none;
+  border-radius: 2rem;
+  background-size: 100% !important;
+  background: url("./images/button_background.png") no-repeat center;
+  font-size: 4rem;
+  color: lightcoral;
+  padding: 4rem 1rem 3rem;
+  aspect-ratio: 19/12;
+}
+
+.no-wrapper {
+  padding: 0;
+  margin: 0;
+  display: inline-flex;
+  width: 35vw;
+  aspect-ratio: 19/12;
 }
 
 /*# sourceMappingURL=style.css.map */

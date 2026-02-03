@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    /* Target modern JavaScript */
+    "target": "ES2015",
+    "module": "ESNext",
+
+    /* Include Browser and ES6 features */
+    "lib": ["DOM", "DOM.Iterable", "ES2015"],
+
+    /* Best practices for modern projects */
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node"
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules"]
+}

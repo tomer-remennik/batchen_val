@@ -1,0 +1,190 @@
+const initReverseVideo = async (): Promise<void> => {
+    const loader = document.getElementById('loader');
+    const content = document.getElementById('main-content');
+    const video = document.getElementById('bg-video') as HTMLVideoElement | null;
+    if (!video || !loader || !content) return;
+
+    const maxSpeed = 0.02;
+    const edgeBuffer = 0.1;
+    let direction = 1;
+
+    try {
+        const response = await fetch('./images/output_240.mp4');
+        if (!response.ok) {
+            console.error('Video preload failed: bad response', response.status);
+            return;
+        }
+        const blob = await response.blob();
+        video.src = URL.createObjectURL(blob);
+
+        await new Promise((resolve) => {
+            video.oncanplaythrough = resolve;
+        });
+
+        video.muted = true;
+        video.pause();
+        video.currentTime = edgeBuffer;
+        loader.style.transition = 'opacity 1.5s ease';
+        loader.style.opacity = '0';
+        content.style.opacity = '1';
+        setTimeout(() => {
+            loader.style.display = 'none';
+        }, 1500);
+    } catch (err) {
+        console.error("Video preload failed:", err);
+        return;
+    }
+
+    const handleYoYo = (): void => {
+        if (video.seeking) {
+            requestAnimationFrame(handleYoYo);
+            return;
+        }
+
+        const duration = video.duration;
+        const start = edgeBuffer;
+        const end = duration - edgeBuffer;
+        const currentPos = video.currentTime;
+
+        const progress = (currentPos - start) / (end - start);
+        const speedCurve = 1 - (0.5 * progress * (1 - progress));
+        const currentSpeed = maxSpeed * speedCurve;
+
+        if (direction === 1) {
+            video.currentTime += currentSpeed;
+            if (video.currentTime >= end) {
+                video.currentTime = end;
+                direction = -1;
+            }
+
+        } else {
+            video.currentTime -= currentSpeed;
+            if (video.currentTime <= start) {
+                video.currentTime = start;
+                direction = 1;
+            }
+        }
+
+        requestAnimationFrame(handleYoYo);
+    };
+
+    video.addEventListener('play', () => video.pause());
+
+    handleYoYo();
+};
+
+initReverseVideo().then(() => {
+});
+
+const moveButton = (noBtn: HTMLButtonElement, yesBtn: HTMLButtonElement): void => {
+    if (noBtn.style.position !== 'fixed') {
+        const initialRect = noBtn.getBoundingClientRect();
+        Object.assign(noBtn.style, {
+            position: 'fixed',
+            left: `${initialRect.left}px`,
+            top: `${initialRect.top}px`,
+            margin: '0',
+            zIndex: '1000'
+        });
+
+        noBtn.offsetHeight;
+    }
+
+    const noRect: DOMRect = noBtn.getBoundingClientRect();
+    const yesRect: DOMRect = yesBtn.getBoundingClientRect();
+
+    const maxX: number = window.innerWidth - noRect.width;
+    const maxY: number = window.innerHeight - noRect.height;
+
+    let randomX: number = 0;
+    let randomY: number = 0;
+    let isOverlapping: boolean = true;
+    let attempts: number = 0;
+
+    while (isOverlapping && attempts < 50) {
+        randomX = Math.floor(Math.random() * maxX);
+        randomY = Math.floor(Math.random() * maxY);
+
+        const buffer = 20;
+        const overlapX = randomX + noRect.width > yesRect.left - buffer &&
+            randomX < yesRect.right + buffer;
+        const overlapY = randomY + noRect.height > yesRect.top - buffer &&
+            randomY < yesRect.bottom + buffer;
+
+        if (!(overlapX && overlapY)) {
+            isOverlapping = false;
+        }
+        attempts++;
+    }
+
+    Object.assign(noBtn.style, {
+        position: 'fixed',
+        left: `${randomX}px`,
+        top: `${randomY}px`,
+        margin: '0',
+        zIndex: '1000',
+        transition: 'all 0.2s ease'
+    });
+};
+
+const initDodgingButton = (): void => {
+    const noBtn = document.querySelector<HTMLButtonElement>('.no');
+    const yesBtn = document.querySelector<HTMLButtonElement>('.yes');
+
+    if (noBtn && yesBtn) {
+        noBtn.addEventListener('mouseover', () => moveButton(noBtn, yesBtn));
+
+        noBtn.addEventListener('touchstart', (e: TouchEvent) => {
+            e.preventDefault();
+            moveButton(noBtn, yesBtn);
+        });
+    }
+};
+
+document.addEventListener('DOMContentLoaded', initDodgingButton);
+
+declare var confetti: any;
+
+const handleYesClick = (): void => {
+    const buttonContainer = document.querySelector('.button-container');
+    if (buttonContainer) buttonContainer.setAttribute('style', 'display: none');
+
+    const duration = 4 * 1000;
+    const end = Date.now() + duration;
+    const colors = ['#f44336', '#ffb7b7', '#ff8a8a'];
+
+    (function frame() {
+        confetti({
+            particleCount: 2,
+            angle: 75,
+            spread: 40,
+            origin: {x: 0, y: 0.8},
+            colors: colors,
+            scalar: 2,
+            startVelocity: 100,
+            gravity: 0.75
+        });
+        confetti({
+            particleCount: 2,
+            angle: 105,
+            spread: 40,
+            origin: {x: 1, y: 0.8},
+            colors: colors,
+            scalar: 2,
+            startVelocity: 100,
+            gravity: 0.75
+        });
+
+        if (Date.now() < end) {
+            requestAnimationFrame(frame);
+        }
+    }());
+
+    const h1 = document.querySelector('h1');
+    if (h1) h1.innerText = "יששששש! תודה בת-חני! זכית בקרפ ומלא נשיקות :)";
+};
+
+const yesBtn = document.querySelector<HTMLButtonElement>('.yes');
+if (yesBtn) {
+    yesBtn.addEventListener('click', handleYesClick);
+}
