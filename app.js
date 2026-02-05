@@ -140,7 +140,7 @@ const handleYesClick = () => {
     const buttonContainer = document.querySelector('.button-container');
     if (buttonContainer)
         buttonContainer.setAttribute('style', 'display: none');
-    const duration = 4 * 1000;
+    const duration = 3 * 1000;
     const end = Date.now() + duration;
     const colors = ['#f44336', '#ffb7b7', '#ff8a8a'];
     (function frame() {
