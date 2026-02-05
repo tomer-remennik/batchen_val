@@ -8,32 +8,39 @@ const initReverseVideo = async (): Promise<void> => {
     const edgeBuffer = 0.1;
     let direction = 1;
 
-    try {
-        const response = await fetch('./images/output_240.mp4');
-        if (!response.ok) {
-            console.error('Video preload failed: bad response', response.status);
-            return;
+    const maxRetries = 3;
+    let attempts = 0;
+    let success = false;
+
+    while (attempts < maxRetries && !success) {
+        try {
+            attempts++;
+            const response = await fetch('./images/output_240.mp4');
+            if (!response.ok) throw new Error(`Status ${response.status}`);
+            const blob = await response.blob();
+            video.src = URL.createObjectURL(blob);
+
+            await new Promise((resolve) => {
+                video.oncanplaythrough = resolve;
+            });
+
+            success = true;
+        } catch (err) {
+            console.error("Video preload failed:", err);
+            if (attempts >= maxRetries) return;
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
-        const blob = await response.blob();
-        video.src = URL.createObjectURL(blob);
-
-        await new Promise((resolve) => {
-            video.oncanplaythrough = resolve;
-        });
-
-        video.muted = true;
-        video.pause();
-        video.currentTime = edgeBuffer;
-        loader.style.transition = 'opacity 1.5s ease';
-        loader.style.opacity = '0';
-        content.style.opacity = '1';
-        setTimeout(() => {
-            loader.style.display = 'none';
-        }, 1500);
-    } catch (err) {
-        console.error("Video preload failed:", err);
-        return;
     }
+
+    video.muted = true;
+    video.pause();
+    video.currentTime = edgeBuffer;
+    loader.style.transition = 'opacity 1.5s ease';
+    loader.style.opacity = '0';
+    content.style.opacity = '1';
+    setTimeout(() => {
+        loader.style.display = 'none';
+    }, 1500);
 
     const handleYoYo = (): void => {
         if (video.seeking) {
